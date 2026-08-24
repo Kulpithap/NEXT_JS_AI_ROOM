@@ -70,3 +70,77 @@ model Verification {
   @@index([identifier(length: 191)])
   @@map("verification")
 }
+
+// =============================================
+// E-commerce tables (สร้างด้วย raw SQL ใน docs/create_table_ecommerce.sql)
+// =============================================
+enum OrderStatus {
+  delivered
+  received
+  processing
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String?
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int           @id @default(autoincrement())
+  name        String?
+  description String?       @db.Text
+  price       Float?
+  categoryId  Int?          @map("category_id")
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Customer {
+  id      Int     @id @default(autoincrement())
+  name    String?
+  address String? @db.VarChar(500)
+  phone   String? @db.VarChar(20)
+  orders  Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  date        DateTime?
+  customerId  Int?        @map("customer_id")
+  customer    Customer?   @relation(fields: [customerId], references: [id])
+  status      OrderStatus?
+  totalAmount Float?      @map("total_amount")
+  items       OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int     @map("order_id")
+  productId Int     @map("product_id")
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model ProductImage {
+  id        Int       @id @default(autoincrement())
+  productId Int       @map("product_id")
+  imageName String?   @db.Text @map("image_name")
+  createdAt DateTime? @default(now()) @db.Timestamp() @map("created_at")
+  product   Product   @relation(fields: [productId], references: [id])
+
+  @@map("product_images")
+}
