@@ -16,7 +16,7 @@ const Navbar = async () => {
   });
 
   return (
-    <nav className="h-16 border-b bg-background">
+    <nav className="glass sticky top-0 z-50 h-16">
       <div className="mx-auto flex h-full max-w-(--breakpoint-xl) items-center justify-between px-4 sm:px-6 lg:px-8">
         <Logo />
 

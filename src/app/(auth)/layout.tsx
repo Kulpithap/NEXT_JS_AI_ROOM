@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Prompt, Roboto, Lora } from "next/font/google";
+import { Prompt, Plus_Jakarta_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import "../globals.css";
 
@@ -7,14 +7,18 @@ import "../globals.css";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const loraHeading = Lora({subsets:['latin'],variable:'--font-heading'});
+// ManuVox design system font: Plus Jakarta Sans (docs/design.md §1.2)
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
-const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
-
-export const promptFont = Prompt({
-  weight: ['400', '500', '700'],
-  subsets: ['thai'],
-  display: 'swap'
+const prompt = Prompt({
+  weight: ["400", "500", "700"],
+  subsets: ["thai"],
+  variable: "--font-prompt",
+  display: "swap",
 });
 
 
@@ -31,7 +35,7 @@ export default function AuthLayout({
   return (
     <html
       lang="th"
-      className={cn(promptFont.className, "font-sans", roboto.variable, loraHeading.variable)}
+      className={cn(jakarta.variable, prompt.variable)}
     >
       <body>
         {children}
