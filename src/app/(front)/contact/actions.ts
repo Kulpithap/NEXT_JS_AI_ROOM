@@ -31,6 +31,8 @@ export type ContactFormState = {
   values?: ContactFormValues;
 };
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export async function sendContactMessage(
   _prevState: ContactFormState,
   formData: FormData,
@@ -76,9 +78,9 @@ export async function sendContactMessage(
     };
   }
 
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
+    try {
+      const { error } = await resend.emails.send({
+
       from: fromEmail,
       to: [toEmail],
       replyTo: parsed.data.email,

@@ -9,7 +9,10 @@ export default async function DashboardPage() {
     headers: await headers(),
   });
 
+  console.log("Dashboard session:", session?.user);
+
   if (!session) {
+    console.log("Redirect: No session");
     redirect("/");
   }
 
@@ -17,7 +20,10 @@ export default async function DashboardPage() {
     where: { id: session.user.id },
   });
 
+  console.log("Dashboard user:", user);
+
   if (!user || (user as any).role !== "admin") {
+    console.log("Redirect: Not admin");
     redirect("/");
   }
 

@@ -27,6 +27,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { ProductSchema, type ProductInput } from "@/lib/validations/product";
+import { useToastStore } from "@/lib/store/toast-store";
 
 interface Product {
   id: number;
@@ -53,6 +54,7 @@ export default function ProductManager() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { addToast } = useToastStore();
 
   const form = useForm<ProductInput>({
     resolver: zodResolver(ProductSchema) as any,
@@ -142,9 +144,9 @@ export default function ProductManager() {
 
       setIsSheetOpen(false);
       fetchProducts();
-      alert(editingProduct ? "อัปเดตสินค้าสำเร็จ" : "เพิ่มสินค้าสำเร็จ");
+      addToast(editingProduct ? "อัปเดตสินค้าสำเร็จ" : "เพิ่มสินค้าสำเร็จ", "success");
     } catch (e: any) {
-      alert(e.message);
+      addToast(e.message, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -165,9 +167,9 @@ export default function ProductManager() {
       }
 
       fetchProducts();
-      alert("ลบสินค้าสำเร็จ");
+      addToast("ลบสินค้าสำเร็จ", "success");
     } catch (e: any) {
-      alert(e.message);
+      addToast(e.message, "error");
     } finally {
       setIsDeleting(false);
     }
