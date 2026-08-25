@@ -1,6 +1,5 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "plugin": ["@dietrichgebert/ponytail"],
   "style": "radix-rhea",
   "rsc": true,
   "tsx": true,
