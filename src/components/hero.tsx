@@ -34,7 +34,7 @@ export default function Hero() {
             size="lg"
             variant="outline"
           >
-            <CirclePlay className="h-5! w-5!" /> Watch Demo
+            <CirclePlay className="h-5! w-5!" /> Watch This Demo
           </Button>
         </div>
       </div>

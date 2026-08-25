@@ -8,12 +8,21 @@ import { ShoppingBasket } from "lucide-react";
 import CountCartItem from "@/app/(front)/components/CountCartItem";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import prisma from "@/lib/prisma";
 import LogoutButton from "./logout-button";
 
 const Navbar = async () => {
   const session = await auth.api.getSession({
     headers: await headers()
   });
+  
+  let userRole = "user";
+  if (session) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+    userRole = (dbUser as any)?.role || "user";
+  }
 
   return (
     <nav className="glass sticky top-0 z-50 h-16">
@@ -44,18 +53,23 @@ const Navbar = async () => {
             )
           }
 
-          {
-            session && (
-              <>
-                <div className="flex items-center mr-4">
-                  สวัสดี, {session.user.name}
-                </div>
-                <div>
-                  <LogoutButton />
-                </div>
-              </>
-            )
-          }
+           {
+             session && (
+               <>
+                 {userRole === "admin" && (
+                   <Button asChild variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                     <Link href="/dashboard">Dashboard</Link>
+                   </Button>
+                 )}
+                 <div className="flex items-center mr-4">
+                   สวัสดี, {session.user.name}
+                 </div>
+                 <div>
+                   <LogoutButton />
+                 </div>
+               </>
+             )
+           }
 
           {/* Mobile Menu */}
           <div className="md:hidden">

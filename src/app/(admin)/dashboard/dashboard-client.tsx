@@ -13,20 +13,22 @@ import {
   Area,
 } from "recharts";
 import { 
-  TrendingUp, 
-  Users, 
-  ShoppingBag, 
-  DollarSign, 
-  RefreshCcw, 
-  AlertCircle,
-  ArrowUpRight,
-  ArrowDownRight 
-} from "lucide-react";
+   TrendingUp, 
+   Users, 
+   ShoppingBag, 
+   DollarSign, 
+   RefreshCcw, 
+   AlertCircle,
+   ArrowUpRight,
+   ArrowDownRight 
+ } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import ProductManager from "./product-manager";
+
 
 interface Stats {
   totalRevenue: number;
@@ -51,6 +53,7 @@ interface Order {
 type Period = "7d" | "30d" | "90d";
 
 export default function DashboardClient({ user }: { user: any }) {
+  const [activeTab, setActiveTab] = useState<"stats" | "products">("stats");
   const [period, setPeriod] = useState<Period>("30d");
   const [stats, setStats] = useState<Stats | null>(null);
   const [revenue, setRevenue] = useState<RevenueData[]>([]);
@@ -138,176 +141,204 @@ export default function DashboardClient({ user }: { user: any }) {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, {user.name}</p>
-        </div>
-        <div className="flex gap-2 bg-white p-1 rounded-lg border shadow-sm">
-          {(["7d", "30d", "90d"] as Period[]).map((p) => (
-            <Button
-              key={p}
-              variant={period === p ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setPeriod(p)}
-              className="px-4"
+        <div className="flex items-center gap-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back, {user.name}</p>
+          </div>
+          <div className="flex p-1 bg-slate-200/50 rounded-lg border">
+            <Button 
+              variant={activeTab === "stats" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveTab("stats")}
+              className="rounded-md"
             >
-              {p === "7d" && "7 วัน"}
-              {p === "30d" && "30 วัน"}
-              {p === "90d" && "90 วัน"}
+              ภาพรวม
             </Button>
-          ))}
+            <Button 
+              variant={activeTab === "products" ? "default" : "ghost"} 
+              size="sm" 
+              onClick={() => setActiveTab("products")}
+              className="rounded-md"
+            >
+              จัดการสินค้า
+            </Button>
+          </div>
         </div>
+        {activeTab === "stats" && (
+          <div className="flex gap-2 bg-white p-1 rounded-lg border shadow-sm">
+            {(["7d", "30d", "90d"] as Period[]).map((p) => (
+              <Button
+                key={p}
+                variant={period === p ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setPeriod(p)}
+                className="px-4"
+              >
+                {p === "7d" && "7 วัน"}
+                {p === "30d" && "30 วัน"}
+                {p === "90d" && "90 วัน"}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="รายได้รวม" 
-          value={stats ? formatCurrency(stats.totalRevenue) : "..."} 
-          icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} 
-          loading={loading.stats} 
-          error={errors.stats}
-          onRetry={fetchStats}
-        />
-        <StatCard 
-          title="คำสั่งซื้อ" 
-          value={stats ? stats.totalOrders.toLocaleString() : "..."} 
-          icon={<ShoppingBag className="h-4 w-4 text-muted-foreground" />} 
-          loading={loading.stats} 
-          error={errors.stats}
-          onRetry={fetchStats}
-        />
-        <StatCard 
-          title="ลูกค้าทั้งหมด" 
-          value={stats ? stats.totalCustomers.toLocaleString() : "..."} 
-          icon={<Users className="h-4 w-4 text-muted-foreground" />} 
-          loading={loading.stats} 
-          error={errors.stats}
-          onRetry={fetchStats}
-        />
-        <StatCard 
-          title="เฉลี่ยต่อออเดอร์" 
-          value={stats ? formatCurrency(stats.avgOrderValue) : "..."} 
-          icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />} 
-          loading={loading.stats} 
-          error={errors.stats}
-          onRetry={fetchStats}
-        />
-      </div>
+      {activeTab === "products" ? (
+        <ProductManager />
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard 
+              title="รายได้รวม" 
+              value={stats ? formatCurrency(stats.totalRevenue) : "..."} 
+              icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} 
+              loading={loading.stats} 
+              error={errors.stats}
+              onRetry={fetchStats}
+            />
+            <StatCard 
+              title="คำสั่งซื้อ" 
+              value={stats ? stats.totalOrders.toLocaleString() : "..."} 
+              icon={<ShoppingBag className="h-4 w-4 text-muted-foreground" />} 
+              loading={loading.stats} 
+              error={errors.stats}
+              onRetry={fetchStats}
+            />
+            <StatCard 
+              title="ลูกค้าทั้งหมด" 
+              value={stats ? stats.totalCustomers.toLocaleString() : "..."} 
+              icon={<Users className="h-4 w-4 text-muted-foreground" />} 
+              loading={loading.stats} 
+              error={errors.stats}
+              onRetry={fetchStats}
+            />
+            <StatCard 
+              title="เฉลี่ยต่อออเดอร์" 
+              value={stats ? formatCurrency(stats.avgOrderValue) : "..."} 
+              icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />} 
+              loading={loading.stats} 
+              error={errors.stats}
+              onRetry={fetchStats}
+            />
+          </div>
 
-      <div className="grid gap-6 md:grid-cols-7">
-        {/* Revenue Chart */}
-        <Card className="md:col-span-4">
-          <CardHeader>
-            <CardTitle>แนวโน้มรายได้</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading.revenue ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : errors.revenue ? (
-              <div className="h-[300px] flex flex-col items-center justify-center gap-2 text-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
-                <p className="text-sm text-muted-foreground">{errors.revenue}</p>
-                <Button variant="outline" size="sm" onClick={fetchRevenue}>
-                  <RefreshCcw className="mr-2 h-3 w-3" /> ลองอีกครั้ง
-                </Button>
-              </div>
-            ) : (
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={revenue}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis 
-                      dataKey="date" 
-                      tickFormatter={(str) => new Date(str).toLocaleDateString("th-TH", { day: 'numeric', month: 'short' })}
-                    />
-                    <YAxis 
-                      tickFormatter={(val) => `฿${val / 1000}k`}
-                    />
-                    <Tooltip 
-                      formatter={(val: any) => [formatCurrency(Number(val) || 0), "รายได้"]}
-                      labelFormatter={(label: any) => formatDate(String(label))}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="amount" 
-                      stroke="#3b82f6" 
-                      fillOpacity={1} 
-                      fill="url(#colorRevenue)" 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          <div className="grid gap-6 md:grid-cols-7">
+            {/* Revenue Chart */}
+            <Card className="md:col-span-4">
+              <CardHeader>
+                <CardTitle>แนวโน้มรายได้</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading.revenue ? (
+                  <div className="h-[300px] flex items-center justify-center">
+                    <Spinner />
+                  </div>
+                ) : errors.revenue ? (
+                  <div className="h-[300px] flex flex-col items-center justify-center gap-2 text-center">
+                    <AlertCircle className="h-8 w-8 text-destructive" />
+                    <p className="text-sm text-muted-foreground">{errors.revenue}</p>
+                    <Button variant="outline" size="sm" onClick={fetchRevenue}>
+                      <RefreshCcw className="mr-2 h-3 w-3" /> ลองอีกครั้ง
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={revenue}>
+                        <defs>
+                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis 
+                          dataKey="date" 
+                          tickFormatter={(str) => new Date(str).toLocaleDateString("th-TH", { day: 'numeric', month: 'short' })}
+                        />
+                        <YAxis 
+                          tickFormatter={(val) => `฿${val / 1000}k`}
+                        />
+                        <Tooltip 
+                          formatter={(val: any) => [formatCurrency(Number(val) || 0), "รายได้"]}
+                          labelFormatter={(label: any) => formatDate(String(label))}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="amount" 
+                          stroke="#3b82f6" 
+                          fillOpacity={1} 
+                          fill="url(#colorRevenue)" 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-        {/* Recent Orders */}
-        <Card className="md:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>ออเดอร์ล่าสุด</CardTitle>
-            <Button variant="ghost" size="sm" onClick={fetchOrders} disabled={loading.orders}>
-              <RefreshCcw className={`h-3 w-3 ${loading.orders ? "animate-spin" : ""}`} />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {loading.orders ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Spinner />
-              </div>
-            ) : errors.orders ? (
-              <div className="h-[300px] flex flex-col items-center justify-center gap-2 text-center">
-                <AlertCircle className="h-8 w-8 text-destructive" />
-                <p className="text-sm text-muted-foreground">{errors.orders}</p>
-                <Button variant="outline" size="sm" onClick={fetchOrders}>
-                  <RefreshCcw className="mr-2 h-3 w-3" /> ลองอีกครั้ง
+            {/* Recent Orders */}
+            <Card className="md:col-span-3">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>ออเดอร์ล่าสุด</CardTitle>
+                <Button variant="ghost" size="sm" onClick={fetchOrders} disabled={loading.orders}>
+                  <RefreshCcw className={`h-3 w-3 ${loading.orders ? "animate-spin" : ""}`} />
                 </Button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ออเดอร์</TableHead>
-                      <TableHead>ลูกค้า</TableHead>
-                      <TableHead className="text-right">ยอดรวม</TableHead>
-                      <TableHead className="text-center">สถานะ</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                          ไม่พบข้อมูลออเดอร์
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      orders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-medium">#{order.id}</TableCell>
-                          <TableCell>{order.customerName}</TableCell>
-                          <TableCell className="text-right">{formatCurrency(order.totalAmount)}</TableCell>
-                          <TableCell className="text-center">
-                            <OrderStatusBadge status={order.status} />
-                          </TableCell>
+              </CardHeader>
+              <CardContent>
+                {loading.orders ? (
+                  <div className="h-[300px] flex items-center justify-center">
+                    <Spinner />
+                  </div>
+                ) : errors.orders ? (
+                  <div className="h-[300px] flex flex-col items-center justify-center gap-2 text-center">
+                    <AlertCircle className="h-8 w-8 text-destructive" />
+                    <p className="text-sm text-muted-foreground">{errors.orders}</p>
+                    <Button variant="outline" size="sm" onClick={fetchOrders}>
+                      <RefreshCcw className="mr-2 h-3 w-3" /> ลองอีกครั้ง
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>ออเดอร์</TableHead>
+                          <TableHead>ลูกค้า</TableHead>
+                          <TableHead className="text-right">ยอดรวม</TableHead>
+                          <TableHead className="text-center">สถานะ</TableHead>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                      </TableHeader>
+                      <TableBody>
+                        {orders.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                              ไม่พบข้อมูลออเดอร์
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          orders.map((order) => (
+                            <TableRow key={order.id}>
+                              <TableCell className="font-medium">#{order.id}</TableCell>
+                              <TableCell>{order.customerName}</TableCell>
+                              <TableCell className="text-right">{formatCurrency(order.totalAmount)}</TableCell>
+                              <TableCell className="text-center">
+                                <OrderStatusBadge status={order.status} />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }
